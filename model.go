@@ -1,22 +1,57 @@
 package main
 
+import "fmt"
+
 type Game struct {
-	Rooms [][]Room
+	Rooms   []Room
+	Players []Player
 }
 
 type Position struct {
-	X int
-	Y int
+	Room int
+	X    int
+	Y    int
 }
 type Room struct {
-	Terrain  Terrain
-	Elements []GameElement
+	RoomId    int
+	Terrain   Terrain
+	Units     []Unit
+	Buildings []Building
+	ExitTo    []int
 }
 
 type Terrain struct {
 }
 
+type Idable interface {
+	GetId() int
+}
+
+type Locatable interface {
+	locate(game *Game) Position
+}
+
+type RoomLocatable interface {
+	locateRoom() int
+}
+
+type DirectLocatable interface {
+	locate() Position
+}
+
+type HealthCheckable interface {
+	GetHealth() int
+}
+
+type GameElementable interface {
+	Idable
+	Locatable
+	HealthCheckable
+}
+
 type GameElement struct {
+	Id       int
+	RoomId   int
 	Position Position
 	Health   int
 }
@@ -58,18 +93,23 @@ type Unit struct {
 	Manufactoring int
 }
 
+func (u Unit) GetId() int            { return u.Id }
+func (u Unit) GetHealth() int        { return u.Health }
+func (u Unit) GetPosition() Position { return u.Position }
+
 type Blueprint struct {
 }
 
 type Player struct {
-	Id   int
-	Name string
+	Id     int
+	Name   string
+	Script string
 }
 
 type PlayerScriptTask struct {
 	PlayerId int
 	Script   string
-	GameJson string
+	Game     *Game
 }
 
 type ScriptResponse struct {
@@ -77,18 +117,67 @@ type ScriptResponse struct {
 	TimedOut bool
 	Err      string
 	Console  string
-	Commands []*PlayerCommand
+	Commands []PlayerCommand
 }
 
-type PlayerCommand struct{}
+type RoomTransitionTask struct {
+	Room     *Room
+	Commands *[]*RoomCommand
+}
+
+type RoomTransitionResponse struct {
+	errors *[]*CommandFailure
+}
+
+type CommandFailure struct {
+	command *RoomCommand
+	cause   string
+}
+
+type RoomCommand struct {
+	PlayerId int
+	Command  PlayerCommand
+}
+
+type PlayerCommand interface {
+	RoomLocatable
+	describe() string
+}
 
 type MoveCommand struct {
+	roomId int
 	unit   int
 	target Position
 }
 
+func (m MoveCommand) describe() string {
+	return fmt.Sprintf("move %v to r%vx%vy%v", m.unit, m.roomId, m.target.X, m.target.Y)
+}
+func (move MoveCommand) locateRoom() int { return move.roomId }
+
+type AttackCommand struct {
+	roomId int
+	unit   int
+	target Position
+}
+
+func (m AttackCommand) describe() string {
+	return fmt.Sprintf("attack %v to r%vx%vy%v", m.unit, m.roomId, m.target.X, m.target.Y)
+}
+func (move AttackCommand) locateRoom() int { return move.roomId }
+
 type BuildCommand struct {
+	roomId   int
 	unit     int
 	target   Position
 	building string
+}
+
+func (m BuildCommand) describe() string {
+	return fmt.Sprintf("build %v by %v on r%vx%vy%v", m.building, m.unit, m.roomId, m.target.X, m.target.Y)
+}
+func (move BuildCommand) locateRoom() int { return move.roomId }
+
+type PlayerMemory struct {
+	Data string
 }
