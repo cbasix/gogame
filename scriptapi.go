@@ -14,7 +14,7 @@ func injectGameObject(jsCtx *v8go.Context, game *Game, commands chan<- PlayerCom
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("game = %v; game", string(gameJs))
+	//fmt.Printf("game = %v; game", string(gameJs))
 	_, jsErr := jsCtx.RunScript(fmt.Sprintf("game = %v; game", string(gameJs)), "init.js")
 	if jsErr != nil {
 		panic(jsErr)
@@ -23,27 +23,37 @@ func injectGameObject(jsCtx *v8go.Context, game *Game, commands chan<- PlayerCom
 
 	unitMove, _ := v8go.NewFunctionTemplate(vm, func(info *v8go.FunctionCallbackInfo) *v8go.Value {
 		args := info.Args()
-		commands <- &MoveCommand{
-			unit:   int(args[0].Int32()),
-			target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+		if len(args) == 4 {
+			// TODO Error handling here
+			commands <- &MoveCommand{
+				unit:   int(args[0].Int32()),
+				target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+			}
+
 		}
 		return nil
+
 	})
 
 	unitAttack, _ := v8go.NewFunctionTemplate(vm, func(info *v8go.FunctionCallbackInfo) *v8go.Value {
 		args := info.Args()
-		commands <- &AttackCommand{
-			unit:   int(args[0].Int32()),
-			target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+		if len(args) == 4 {
+			commands <- &AttackCommand{
+				unit:   int(args[0].Int32()),
+				target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+			}
 		}
 		return nil
 	})
 
 	unitBuild, _ := v8go.NewFunctionTemplate(vm, func(info *v8go.FunctionCallbackInfo) *v8go.Value {
 		args := info.Args()
-		commands <- &BuildCommand{
-			unit:   int(args[0].Int32()),
-			target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+		if len(args) == 5 {
+			commands <- &BuildCommand{
+				unit:     int(args[0].Int32()),
+				target:   Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+				building: args[1].String(),
+			}
 		}
 		return nil
 	})

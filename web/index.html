@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+  <style>* {padding: 0; margin: 0}</style>
+</head>
+  <script src="pixi.min.js"></script>
+<body>
+  <script type="text/javascript">
+    let type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas"
+    }
+
+    PIXI.utils.sayHello(type)
+
+    //Create a Pixi Application
+    let app = new PIXI.Application({width: 512, height: 512});
+
+    //Add the canvas that Pixi automatically created for you to the HTML document
+    document.body.appendChild(app.view);
+
+    app.renderer.view.style.position = "absolute";
+    app.renderer.view.style.display = "block";
+    app.renderer.autoResize = true;
+    app.renderer.resize(window.innerWidth, window.innerHeight);
+
+
+    PIXI.loader
+        .add("map.jpg")
+        .load(setup);
+
+    function setup() {
+        let map = new PIXI.Sprite(
+            PIXI.loader.resources["map.jpg"].texture
+        );
+        let targetSize = Math.min(window.innerHeight, window.innerWidth)
+        map.width = targetSize
+        map.height = targetSize
+        app.stage.addChild(map);
+    }
+  </script>
+</body>
+</html>

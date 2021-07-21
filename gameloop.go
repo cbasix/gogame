@@ -4,21 +4,18 @@ import (
 	"context"
 )
 
-func convertToRoomCommands(scriptResponses []*ScriptResponse) *map[int]*[]*RoomCommand {
-	roomCommands := make(map[int]*[]*RoomCommand)
+func groupCommandsByRoom(scriptResponses []*ScriptResponse) *map[int]*[]PlayerCommand {
+	roomCommands := make(map[int]*[]PlayerCommand)
 
 	for _, scriptResponse := range scriptResponses {
 		for _, command := range scriptResponse.Commands {
 			roomId := command.locateRoom()
 			cmdList, exists := roomCommands[roomId]
 			if !exists {
-				cmdList = &[]*RoomCommand{}
+				cmdList = &[]PlayerCommand{}
 				roomCommands[roomId] = cmdList
 			}
-			*cmdList = append(*cmdList, &RoomCommand{
-				PlayerId: scriptResponse.PlayerId,
-				Command:  command,
-			})
+			*cmdList = append(*cmdList, command)
 		}
 	}
 
@@ -28,7 +25,7 @@ func convertToRoomCommands(scriptResponses []*ScriptResponse) *map[int]*[]*RoomC
 const SCRIPT_ROUTINES = 5
 const TRANSITION_ROUTINES = 5
 
-func tick(game *Game) *[]*CommandFailure {
+func tick(game *Game) (*[]*CommandFailure, *[]*ScriptResponse) {
 	// setup background execution env for player scripts
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -65,14 +62,14 @@ func tick(game *Game) *[]*CommandFailure {
 	}
 
 	// divide commands to their rooms and appy transition to next tick
-	roomCommandMap := convertToRoomCommands(responses)
+	roomCommandMap := groupCommandsByRoom(responses)
 
 	for rId, room := range game.Rooms {
 		cmd, hasCmd := (*roomCommandMap)[rId]
 		if !hasCmd {
-			cmd = &[]*RoomCommand{}
+			cmd = &[]PlayerCommand{}
 		}
-		roomTransitionTasks <- &RoomTransitionTask{&room, cmd}
+		roomTransitionTasks <- &RoomTransitionTask{room, cmd}
 
 	}
 
@@ -83,11 +80,11 @@ func tick(game *Game) *[]*CommandFailure {
 		commandFailures = append(commandFailures, *resp.errors...)
 	}
 
-	return &commandFailures
+	return &commandFailures, &responses
 
 }
 
-type transition func(*Room, *[]*RoomCommand) *[]*CommandFailure
+type transition func(*Room, *[]PlayerCommand) *[]*CommandFailure
 
 func RoomTransitionExecutor(
 	ctx context.Context,

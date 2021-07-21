@@ -66,7 +66,7 @@ func TestMoveCommand(t *testing.T) {
 
 	scriptTasks <- &PlayerScriptTask{
 		PlayerId: 1,
-		Script:   "cmd.move(2, 3, 5)",
+		Script:   "cmd.move(2, 1, 3, 5); cmd.attack(2, 1, 3, 5); cmd.build(2, 1, 3, 5, \"tower\")",
 		Game:     &Game{},
 	}
 	response := <-scriptResponses
@@ -78,6 +78,35 @@ func TestMoveCommand(t *testing.T) {
 	cmd := response.Commands[0]
 	switch v := cmd.(type) {
 	case *MoveCommand:
+		if response.PlayerId != 1 {
+			t.Errorf("playerId should be 1 but is %v", response.PlayerId)
+		}
+		if v.unit != 2 {
+			t.Errorf("unit should be 2 but is %v", v.unit)
+		}
+		if v.target.X != 3 {
+			t.Errorf("X should be 3 but is %v", v.target.X)
+		}
+		if v.target.Y != 5 {
+			t.Errorf("Y should be 5 but is %v", v.target.Y)
+		}
+	case *BuildCommand:
+		if response.PlayerId != 1 {
+			t.Errorf("playerId should be 1 but is %v", response.PlayerId)
+		}
+		if v.unit != 2 {
+			t.Errorf("unit should be 2 but is %v", v.unit)
+		}
+		if v.target.X != 3 {
+			t.Errorf("X should be 3 but is %v", v.target.X)
+		}
+		if v.target.Y != 5 {
+			t.Errorf("Y should be 5 but is %v", v.target.Y)
+		}
+		if v.building != "tower" {
+			t.Errorf("bulding should be tower but is %v", v.building)
+		}
+	case *AttackCommand:
 		if response.PlayerId != 1 {
 			t.Errorf("playerId should be 1 but is %v", response.PlayerId)
 		}
@@ -106,11 +135,9 @@ func TestJsGameInput(t *testing.T) {
 	go PlayerScriptExecutor(ctx, scriptTasks, scriptResponses)
 
 	unit := Unit{
-		GameElement: GameElement{
-			Id:       554,
-			Position: Position{X: 1, Y: 6},
-			Health:   100,
-		},
+		Id:            554,
+		Position:      Position{X: 1, Y: 6},
+		Health:        100,
 		Attack:        10,
 		AttackRange:   1,
 		Heal:          0,
@@ -120,15 +147,15 @@ func TestJsGameInput(t *testing.T) {
 		Manufactoring: 10,
 	}
 
-	room := Room{
-		RoomId: 15,
-		Units:  []Unit{unit},
+	room := &Room{
+		RoomId:   15,
+		Elements: []GameElement{unit},
 	}
 
 	scriptTasks <- &PlayerScriptTask{
 		PlayerId: 1,
-		Script:   "console.log(game.Rooms[0].Units[0].Id)",
-		Game:     &Game{Rooms: []Room{room}},
+		Script:   "console.log(game.Rooms[0].Elements[0].Id)",
+		Game:     &Game{Rooms: []*Room{room}},
 	}
 	response := <-scriptResponses
 

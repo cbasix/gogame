@@ -15,6 +15,7 @@ func PlayerScriptExecutor(
 	scriptResponses chan<- *ScriptResponse) {
 
 	jsVm, _ := v8go.NewIsolate() // creates a new JavaScript VM
+	defer jsVm.Dispose()
 
 	for {
 		for {
