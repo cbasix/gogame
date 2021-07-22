@@ -20,9 +20,36 @@ func newCoordinator() *ListenerCoordinator {
 func main() {
 	coordinator := newCoordinator()
 	listeners := GameListenerSet{}
-	timer := time.Tick(250 * time.Millisecond)
+	timer := time.Tick(500 * time.Millisecond)
 
-	game := &Game{Players: []*Player{{Id: 0, Script: "console.log('HeyHo!')"}}}
+	game := &Game{
+		Players: []*Player{{Id: 0, Script: `
+		Array.prototype.random = function () {
+			return this[Math.floor((Math.random()*this.length))];
+		}
+		
+
+		console.log('HeyHo!'); 
+		let unit = game.Rooms[0].Elements[1];
+		cmd.move(unit.Id, 0, unit.Position.X + [1, 0, -1].random(), unit.Position.Y + [1, 0, -1].random());`}},
+		Rooms: []*Room{
+			{
+				RoomId: 0,
+				Elements: []GameElement{
+					&Unit{
+						Id:       0,
+						Player:   0,
+						Position: Position{0, 4, 3},
+					},
+					&Unit{
+						Id:       1,
+						Player:   0,
+						Position: Position{0, 50, 50},
+					},
+				},
+			},
+		},
+	}
 
 	go startWebserver(coordinator)
 
@@ -84,7 +111,7 @@ func scriptResponseForPlayer(player *Player, scriptResponses *[]*ScriptResponse)
 func cmdFailsForPlayer(player *Player, cmdFails *[]*CommandFailure) *[]*CommandFailure {
 	playerCmdFails := []*CommandFailure{}
 	for _, cmdFail := range *cmdFails {
-		if cmdFail.command.player() == player.Id {
+		if cmdFail.Command.player() == player.Id {
 			playerCmdFails = append(playerCmdFails, cmdFail)
 		}
 	}

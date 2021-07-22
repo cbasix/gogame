@@ -10,8 +10,6 @@ import (
 //go:embed web/*
 var embedFs embed.FS
 
-var wsCoordinator *Coordinator
-
 func startWebserver(coordinator Coordinator) {
 
 	webRoot, err := fs.Sub(embedFs, "web")

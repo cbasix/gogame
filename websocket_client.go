@@ -23,20 +23,15 @@ const (
 	writeWait = 10 * time.Second
 )
 
-var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
-)
-
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
-type InboundMessage struct {
+/*type InboundMessage struct {
 	message []byte
 	client  *Client
-}
+}*/
 
 type Client struct {
 	coordinator Coordinator

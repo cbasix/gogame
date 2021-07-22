@@ -14,14 +14,14 @@ func TestRoomsForPlayer(t *testing.T) {
 		{
 			RoomId: 1,
 			Elements: []GameElement{
-				Unit{Player: 6},
+				&Unit{Player: 6},
 			},
 		},
 		{
 			RoomId: 2,
 			Elements: []GameElement{
-				Unit{Player: 4},
-				Unit{Player: 6},
+				&Unit{Player: 4},
+				&Unit{Player: 6},
 			},
 		},
 		{
@@ -30,7 +30,7 @@ func TestRoomsForPlayer(t *testing.T) {
 		},
 		{
 			RoomId:   4,
-			Elements: []GameElement{Unit{Player: 4}},
+			Elements: []GameElement{&Unit{Player: 4}},
 		},
 	}
 
@@ -66,20 +66,20 @@ func TestScriptsForPlayer(t *testing.T) {
 func TestCmdFailsForPlayer(t *testing.T) {
 	player := &Player{Id: 8}
 	cmdFails := &[]*CommandFailure{
-		{command: AttackCommand{playerId: 8, unit: 1}},
-		{command: AttackCommand{playerId: 7, unit: 2}},
-		{command: BuildCommand{playerId: 8, unit: 3}},
-		{command: AttackCommand{playerId: -7, unit: 4}},
+		{Command: AttackCommand{PlayerId: 8, Unit: 1}},
+		{Command: AttackCommand{PlayerId: 7, Unit: 2}},
+		{Command: BuildCommand{PlayerId: 8, Unit: 3}},
+		{Command: AttackCommand{PlayerId: -7, Unit: 4}},
 	}
 
 	res := cmdFailsForPlayer(player, cmdFails)
 
-	cmd0Unit := (*res)[0].command.(AttackCommand).unit
-	if (*res)[0].command.(AttackCommand).unit != 1 {
+	cmd0Unit := (*res)[0].Command.(AttackCommand).Unit
+	if (*res)[0].Command.(AttackCommand).Unit != 1 {
 		t.Errorf("expected cmd fail with unit 1 but got %v", cmd0Unit)
 	}
 
-	cmd1Unit := (*res)[1].command.(BuildCommand).unit
+	cmd1Unit := (*res)[1].Command.(BuildCommand).Unit
 	if cmd1Unit != 3 {
 		t.Errorf("expected cmd fail with unit 3 but got %v", cmd1Unit)
 	}

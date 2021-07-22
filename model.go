@@ -69,8 +69,8 @@ type RoomTransitionResponse struct {
 }
 
 type CommandFailure struct {
-	command PlayerCommand
-	cause   string
+	Command PlayerCommand
+	Cause   string
 }
 
 // TODO player memory

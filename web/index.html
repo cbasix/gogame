@@ -16,15 +16,15 @@
     PIXI.utils.sayHello(type)
 
     //Create a Pixi Application
-    let app = new PIXI.Application({width: 512, height: 512});
+    let app = new PIXI.Application({width: 3200, height: 3200});
 
     //Add the canvas that Pixi automatically created for you to the HTML document
     document.body.appendChild(app.view);
 
-    app.renderer.view.style.position = "absolute";
-    app.renderer.view.style.display = "block";
-    app.renderer.autoResize = true;
-    app.renderer.resize(window.innerWidth, window.innerHeight);
+    //app.renderer.view.style.position = "absolute";
+    //pp.renderer.view.style.display = "block";
+    //app.renderer.autoResize = true;
+    //app.renderer.resize(window.innerWidth, window.innerHeight);
 
 
     PIXI.loader
@@ -35,10 +35,78 @@
         let map = new PIXI.Sprite(
             PIXI.loader.resources["map.jpg"].texture
         );
-        let targetSize = Math.min(window.innerHeight, window.innerWidth)
-        map.width = targetSize
-        map.height = targetSize
+        //let targetSize = Math.min(window.innerHeight, window.innerWidth)
+        //map.width = targetSize
+        //map.height = targetSize
         app.stage.addChild(map);
+        
+        startSocket()
+    }
+
+    const unusedUnitSprites = [];
+    const unitSprites = new Map();
+
+    function getUnitSprite(){
+      if (unusedUnitSprites.length == 0) {
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(0xe74c3c); // Red
+        graphics.drawCircle(0, 0, 14); // drawCircle(x, y, radius)
+        graphics.endFill();
+        return graphics
+      } else {
+        return unusedUnitSprites.pop()
+      }
+      
+    }
+    function returnUnitSprite(unitSprite){
+      unusedUnitSprites.push(unitSprite)
+    }
+    
+    function startSocket(){
+      let socket = new WebSocket("ws://"+window.location.hostname+":"+window.location.port+"/ws");
+      
+      socket.onopen = function(e) {
+          console.log("[open] Connection established");
+          //alert("Sending to server");
+          //socket.send("My name is John");
+      };
+
+      socket.onmessage = function(event) {
+          console.log(`[message] Data received from server: ${event.data}`)
+          let playerView = JSON.parse(event.data)
+          let room = playerView.Rooms[0]
+          for (let i = 0; i < room.Elements.length; i++){
+            let unit = room.Elements[i]
+
+            let unitSprite
+            if (unitSprites.has(unit.Id)) {
+              unitSprite = unitSprites.get(unit.Id)
+            } else {
+              unitSprite = getUnitSprite()
+              unitSprites.set(unit.Id, unitSprite)
+              app.stage.addChild(unitSprite);
+            }
+            
+            
+            unitSprite.x = unit.Position.X*32+16
+            unitSprite.y = unit.Position.Y*32+16
+            
+          }
+      };
+
+      socket.onclose = function(event) {
+          if (event.wasClean) {
+              console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+          } else {
+              // e.g. server process killed or network down
+              // event.code is usually 1006 in this case
+              console.error('[close] Connection died');
+          }
+      };
+
+      socket.onerror = function(error) {
+          console.error(`[error] ${error.message}`);
+      };
     }
   </script>
 </body>

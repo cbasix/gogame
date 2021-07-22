@@ -6,7 +6,13 @@ func transitionToNextTick(room *Room, commands *[]PlayerCommand) *[]*CommandFail
 
 	for _, command := range *commands {
 		err := command.execute(room)
-		cmdFails = append(cmdFails, &CommandFailure{command: command, cause: err.Error()})
+		if err != nil {
+			fail := &CommandFailure{
+				Command: command,
+				Cause:   err.Error(),
+			}
+			cmdFails = append(cmdFails, fail)
+		}
 	}
 
 	// remove dead bodies / ruins

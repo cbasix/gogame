@@ -11,9 +11,9 @@ func TestConvertToRoomCommands(t *testing.T) {
 			PlayerId: 1,
 			Commands: []PlayerCommand{
 				MoveCommand{
-					roomId: 0,
-					unit:   33,
-					target: Position{0, 4, 5},
+					RoomId: 0,
+					Unit:   33,
+					Target: Position{0, 4, 5},
 				},
 			},
 		},
@@ -21,9 +21,9 @@ func TestConvertToRoomCommands(t *testing.T) {
 			PlayerId: 1,
 			Commands: []PlayerCommand{
 				MoveCommand{
-					roomId: 0,
-					unit:   34,
-					target: Position{0, 4, 7},
+					RoomId: 0,
+					Unit:   34,
+					Target: Position{0, 4, 7},
 				},
 			},
 		},
@@ -31,9 +31,9 @@ func TestConvertToRoomCommands(t *testing.T) {
 			PlayerId: 2,
 			Commands: []PlayerCommand{
 				MoveCommand{
-					roomId: 1,
-					unit:   35,
-					target: Position{1, 2, 3},
+					RoomId: 1,
+					Unit:   35,
+					Target: Position{1, 2, 3},
 				},
 			},
 		},
@@ -72,13 +72,13 @@ func TestRoomTransitionExecutor(t *testing.T) {
 	command := &MoveCommand{}
 
 	go RoomTransitionExecutor(ctx, tasks, responses, func(r *Room, rc *[]PlayerCommand) *[]*CommandFailure {
-		return &[]*CommandFailure{{command: (*rc)[0]}}
+		return &[]*CommandFailure{{Command: (*rc)[0]}}
 	})
 
 	tasks <- &RoomTransitionTask{&Room{}, &[]PlayerCommand{command}}
 
 	result := <-responses
-	if (*result.errors)[0].command != command {
+	if (*result.errors)[0].Command != command {
 		t.Error("Result should match passed command")
 	}
 }

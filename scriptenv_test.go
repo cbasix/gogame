@@ -81,43 +81,43 @@ func TestMoveCommand(t *testing.T) {
 		if response.PlayerId != 1 {
 			t.Errorf("playerId should be 1 but is %v", response.PlayerId)
 		}
-		if v.unit != 2 {
-			t.Errorf("unit should be 2 but is %v", v.unit)
+		if v.Unit != 2 {
+			t.Errorf("unit should be 2 but is %v", v.Unit)
 		}
-		if v.target.X != 3 {
-			t.Errorf("X should be 3 but is %v", v.target.X)
+		if v.Target.X != 3 {
+			t.Errorf("X should be 3 but is %v", v.Target.X)
 		}
-		if v.target.Y != 5 {
-			t.Errorf("Y should be 5 but is %v", v.target.Y)
+		if v.Target.Y != 5 {
+			t.Errorf("Y should be 5 but is %v", v.Target.Y)
 		}
 	case *BuildCommand:
 		if response.PlayerId != 1 {
 			t.Errorf("playerId should be 1 but is %v", response.PlayerId)
 		}
-		if v.unit != 2 {
-			t.Errorf("unit should be 2 but is %v", v.unit)
+		if v.Unit != 2 {
+			t.Errorf("unit should be 2 but is %v", v.Unit)
 		}
-		if v.target.X != 3 {
-			t.Errorf("X should be 3 but is %v", v.target.X)
+		if v.Target.X != 3 {
+			t.Errorf("X should be 3 but is %v", v.Target.X)
 		}
-		if v.target.Y != 5 {
-			t.Errorf("Y should be 5 but is %v", v.target.Y)
+		if v.Target.Y != 5 {
+			t.Errorf("Y should be 5 but is %v", v.Target.Y)
 		}
-		if v.building != "tower" {
-			t.Errorf("bulding should be tower but is %v", v.building)
+		if v.Building != "tower" {
+			t.Errorf("bulding should be tower but is %v", v.Building)
 		}
 	case *AttackCommand:
 		if response.PlayerId != 1 {
 			t.Errorf("playerId should be 1 but is %v", response.PlayerId)
 		}
-		if v.unit != 2 {
-			t.Errorf("unit should be 2 but is %v", v.unit)
+		if v.Unit != 2 {
+			t.Errorf("unit should be 2 but is %v", v.Unit)
 		}
-		if v.target.X != 3 {
-			t.Errorf("X should be 3 but is %v", v.target.X)
+		if v.Target.X != 3 {
+			t.Errorf("X should be 3 but is %v", v.Target.X)
 		}
-		if v.target.Y != 5 {
-			t.Errorf("Y should be 5 but is %v", v.target.Y)
+		if v.Target.Y != 5 {
+			t.Errorf("Y should be 5 but is %v", v.Target.Y)
 		}
 	default:
 		t.Error("Recived command is not a move command pointer")
@@ -149,7 +149,7 @@ func TestJsGameInput(t *testing.T) {
 
 	room := &Room{
 		RoomId:   15,
-		Elements: []GameElement{unit},
+		Elements: []GameElement{&unit},
 	}
 
 	scriptTasks <- &PlayerScriptTask{

@@ -34,9 +34,9 @@ func generateId() int {
 	return currentId
 }
 
-func removeUnordered(s []int, i int) []int {
+/*func removeUnordered(s []int, i int) []int {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
-}
+}*/
 
 type GameListenerSet map[PlayerViewListener]struct{}

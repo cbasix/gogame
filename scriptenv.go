@@ -119,8 +119,8 @@ func insertConsole(jsCtx *v8go.Context, consoleChannel chan<- string) {
 	jsCtx.Global().Set("console", consoleObj)
 }
 
-func insertGameControls(jsCtx *v8go.Context, commandChannel chan<- PlayerCommand) {
-	/*vm, err := jsCtx.Isolate()
+/*func insertGameControls(jsCtx *v8go.Context, commandChannel chan<- PlayerCommand) {
+	vm, err := jsCtx.Isolate()
 	if err != nil {
 		panic(err)
 	}
@@ -150,5 +150,5 @@ func insertGameControls(jsCtx *v8go.Context, commandChannel chan<- PlayerCommand
 
 	gameObj, _ := game.NewInstance(jsCtx)
 
-	jsCtx.Global().Set("game", gameObj)*/
-}
+	jsCtx.Global().Set("game", gameObj)
+}*/

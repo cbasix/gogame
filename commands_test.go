@@ -10,7 +10,7 @@ func TestAttackExecute(t *testing.T) {
 		RoomId: 1,
 	}
 	a := AttackCommand{
-		roomId: 1,
+		RoomId: 1,
 	}
 
 	err := a.execute(room)
@@ -36,9 +36,9 @@ func TestMoveExecute(t *testing.T) {
 	}
 
 	move := MoveCommand{
-		roomId: 0,
-		unit:   8,
-		target: Position{Room: 0, X: 6, Y: 8},
+		RoomId: 0,
+		Unit:   8,
+		Target: Position{Room: 0, X: 6, Y: 8},
 	}
 
 	err := move.execute(room)
@@ -63,13 +63,13 @@ func TestMoveExecuteFailOnDist(t *testing.T) {
 
 	// invalid command dist to current unit position must be 1
 	move := MoveCommand{
-		roomId: 0,
-		unit:   8,
-		target: Position{Room: 0, X: 6, Y: 9},
+		RoomId: 0,
+		Unit:   8,
+		Target: Position{Room: 0, X: 6, Y: 9},
 	}
 
 	err := move.execute(room)
-	if err == nil || !strings.Contains(err.Error(), "Teleport") {
+	if err == nil || !strings.Contains(err.Error(), "teleport") {
 		t.Error("did not get the teleport exception")
 	}
 }

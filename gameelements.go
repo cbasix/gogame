@@ -51,7 +51,7 @@ func (u Unit) GetId() int       { return u.Id }
 func (u Unit) GetHealth() int   { return u.Health }
 func (u Unit) GetPlayer() int   { return u.Player }
 func (u Unit) Locate() Position { return u.Position }
-func (u Unit) TakeDamage(damage int) {
+func (u *Unit) TakeDamage(damage int) {
 	u.Health -= damage
 	if u.Health < 0 {
 		u.Health = 0
@@ -75,7 +75,7 @@ func (u UnitSpawner) GetId() int       { return u.Id }
 func (u UnitSpawner) GetHealth() int   { return u.Health }
 func (u UnitSpawner) GetPlayer() int   { return u.Player }
 func (u UnitSpawner) Locate() Position { return u.Position }
-func (u UnitSpawner) TakeDamage(damage int) {
+func (u *UnitSpawner) TakeDamage(damage int) {
 	u.Health -= damage
 	if u.Health < 0 {
 		u.Health = 0

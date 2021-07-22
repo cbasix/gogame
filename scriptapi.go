@@ -26,8 +26,8 @@ func injectGameObject(jsCtx *v8go.Context, game *Game, commands chan<- PlayerCom
 		if len(args) == 4 {
 			// TODO Error handling here
 			commands <- &MoveCommand{
-				unit:   int(args[0].Int32()),
-				target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+				Unit:   int(args[0].Int32()),
+				Target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
 			}
 
 		}
@@ -39,8 +39,8 @@ func injectGameObject(jsCtx *v8go.Context, game *Game, commands chan<- PlayerCom
 		args := info.Args()
 		if len(args) == 4 {
 			commands <- &AttackCommand{
-				unit:   int(args[0].Int32()),
-				target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+				Unit:   int(args[0].Int32()),
+				Target: Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
 			}
 		}
 		return nil
@@ -50,9 +50,9 @@ func injectGameObject(jsCtx *v8go.Context, game *Game, commands chan<- PlayerCom
 		args := info.Args()
 		if len(args) == 5 {
 			commands <- &BuildCommand{
-				unit:     int(args[0].Int32()),
-				target:   Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
-				building: args[1].String(),
+				Unit:     int(args[0].Int32()),
+				Target:   Position{int(args[1].Int32()), int(args[2].Int32()), int(args[3].Int32())},
+				Building: args[1].String(),
 			}
 		}
 		return nil
