@@ -18,23 +18,20 @@ func PlayerScriptExecutor(
 	defer jsVm.Dispose()
 
 	for {
-		for {
-			select {
-			case scriptTask := <-scriptTasks:
-				commands, console, err := executeScript(jsVm, scriptTask)
+		select {
+		case scriptTask := <-scriptTasks:
+			commands, console, err := executeScript(jsVm, scriptTask)
 
-				scriptResponses <- &ScriptResponse{
-					PlayerId: scriptTask.PlayerId,
-					Err:      errToString(err),
-					Commands: commands,
-					Console:  console,
-				}
-
-			case <-ctx.Done():
-				return
+			scriptResponses <- &ScriptResponse{
+				PlayerId: scriptTask.PlayerId,
+				Err:      errToString(err),
+				Commands: commands,
+				Console:  console,
 			}
-		}
 
+		case <-ctx.Done():
+			return
+		}
 	}
 }
 
@@ -44,8 +41,9 @@ func executeScript(jsVm *v8go.Isolate, scriptTask *PlayerScriptTask) ([]PlayerCo
 
 	vals := make(chan *v8go.Value, 1)
 	errs := make(chan *v8go.JSError, 1)
-	console := make(chan string, 50)
-	commands := make(chan PlayerCommand, 50)
+	console := make(chan string, 10)
+	defer close(console)
+	commands := make(chan PlayerCommand, 10)
 
 	// inject the game / log objects into the js global object
 	injectGameObject(jsCtx, scriptTask.Game, commands)

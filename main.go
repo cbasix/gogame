@@ -1,6 +1,12 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"log"
+	_ "net/http/pprof"
+	"runtime"
+	"time"
+)
 
 type ListenerCoordinator struct {
 	registerListener   chan PlayerViewListener
@@ -16,11 +22,14 @@ func newCoordinator() *ListenerCoordinator {
 		unregisterListener: make(chan PlayerViewListener, 25),
 	}
 }
-
 func main() {
+	log.Print("Starting up")
+	start := time.Now()
+
 	coordinator := newCoordinator()
 	listeners := GameListenerSet{}
 	timer := time.Tick(500 * time.Millisecond)
+	statsTimer := time.Tick(30 * time.Second)
 
 	game := &Game{
 		Players: []*Player{{Id: 0, Script: `
@@ -53,6 +62,7 @@ func main() {
 
 	go startWebserver(coordinator)
 
+	log.Print("Entering gameloop")
 	for {
 		select {
 		case listener := <-coordinator.registerListener:
@@ -68,6 +78,8 @@ func main() {
 			for listener := range listeners {
 				listener.channel() <- (*playerViews)[listener.forPlayer()]
 			}
+		case <-statsTimer:
+			PrintMemUsage(start)
 		}
 	}
 }
@@ -116,4 +128,23 @@ func cmdFailsForPlayer(player *Player, cmdFails *[]*CommandFailure) *[]*CommandF
 		}
 	}
 	return &playerCmdFails
+}
+
+func PrintMemUsage(start time.Time) {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	elapsed := time.Since(start)
+
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tAlloc/h (since start) = %v MiB", bToMbfloat(float32(m.TotalAlloc)/float32(elapsed.Hours())))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
+}
+func bToMbfloat(b float32) float32 {
+	return b / 1024 / 1024
 }

@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports:
+      - "9855:9855"
+    volumes:
+      - .:/code
+      - gamedata:/home/appuser/gamedata
+    cap_drop: 
+      - ALL
+
+volumes:
+  gamedata: {}
