@@ -1,5 +1,5 @@
 
-![Build](https://github.com/cbasix/gogame/actions/workflows/go.yml/badge.svg)
+[![Build & Test](https://github.com/cbasix/gogame/actions/workflows/go.yml/badge.svg)](https://github.com/cbasix/gogame/actions/workflows/go.yml)
 [![codecov](https://codecov.io/gh/cbasix/gogame/branch/main/graph/badge.svg?token=7AROLCRVNZ)](https://codecov.io/gh/cbasix/gogame)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/cbasix/gogame.svg)](https://github.com/cbasix/gogame)
