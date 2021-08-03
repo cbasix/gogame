@@ -1,5 +1,5 @@
 
-![Build](https://github.com/cbasix/gogame/actions/workflows/go/badge.svg)
+![Build](https://github.com/cbasix/gogame/actions/workflows/go.yml/badge.svg)
 
 # A strategy game for coders
 
