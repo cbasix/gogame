@@ -12,7 +12,7 @@ import (
 
 const mapPath = "maps/map.tmx" // Path to your Tiled Map.
 
-func TestRenderMap(t *testing.T) {
+func DeactiveTestRenderMap(t *testing.T) {
 	// Parse .tmx file.
 	gameMap, err := tiled.LoadFromFile(mapPath)
 	if err != nil {
