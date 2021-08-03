@@ -4,6 +4,8 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/cbasix/gogame.svg)](https://github.com/cbasix/gogame)
 [![GoReportCard example](https://goreportcard.com/badge/github.com/cbasix/gogame)](https://goreportcard.com/report/github.com/cbasix/gogame)
+[![GitHub release](https://img.shields.io/github/release/cbasix/gogame.svg)](https://GitHub.com/cbasix/gogame.js/releases/)
+
 
 
 
