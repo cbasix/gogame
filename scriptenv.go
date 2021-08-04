@@ -51,8 +51,16 @@ func executeScript(jsVm *v8go.Isolate, scriptTask *PlayerScriptTask) ([]PlayerCo
 
 	// execute script in its own goroutine to allow canceling it
 	go func() {
+		var sb strings.Builder
+		// base script
+		sb.WriteString(scriptTask.Script)
 
-		val, err := jsCtx.RunScript(scriptTask.Script, "playerscript.js") // execute the player given script
+		// append one off scripts
+		for _, cmd := range scriptTask.OneOffScripts {
+			sb.WriteString(cmd)
+		}
+
+		val, err := jsCtx.RunScript(sb.String(), "playerscript.js") // execute the player given script
 		if err != nil {
 			errs <- err.(*v8go.JSError)
 			return

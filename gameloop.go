@@ -40,10 +40,13 @@ func tick(game *Game) (*[]*CommandFailure, *[]*ScriptResponse) {
 	// execute player scripts
 	for _, p := range game.Players {
 		scriptTasks <- &PlayerScriptTask{
-			PlayerId: p.Id,
-			Game:     game,
-			Script:   p.Script,
+			PlayerId:      p.Id,
+			Game:          game,
+			Script:        p.Script,
+			OneOffScripts: p.OneOffScripts,
 		}
+		// clear one off scripts
+		p.OneOffScripts = []string{}
 	}
 
 	// receive script answers

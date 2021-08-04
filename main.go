@@ -11,10 +11,13 @@ import (
 type ListenerCoordinator struct {
 	registerListener   chan PlayerViewListener
 	unregisterListener chan PlayerViewListener
+	oneOffCode         chan PlayerOneOffCode
 }
 
 func (lc ListenerCoordinator) register() chan<- PlayerViewListener   { return lc.registerListener }
 func (lc ListenerCoordinator) unregister() chan<- PlayerViewListener { return lc.unregisterListener }
+
+//func (lc ListenerCoordinator) oneOff() <-chan PlayerOneOffCode       { return lc.oneOffCode }
 
 func newCoordinator() *ListenerCoordinator {
 	return &ListenerCoordinator{
@@ -70,13 +73,20 @@ func main() {
 			listeners[listener] = struct{}{}
 		case listener := <-coordinator.unregisterListener:
 			delete(listeners, listener)
+		case oneOffCode := <-coordinator.oneOffCode:
+			player := game.Players[oneOffCode.Player]
+			player.OneOffScripts = append(player.OneOffScripts, oneOffCode.Command)
 		case <-timer:
 			cmdFails, scriptResps := tick(game)
 
 			// view per player
 			playerViews := buildPlayerViews(game, cmdFails, scriptResps)
 			for listener := range listeners {
-				listener.channel() <- (*playerViews)[listener.forPlayer()]
+				// non blocking send
+				select {
+				case listener.outChannel() <- (*playerViews)[listener.forPlayer()]:
+				default:
+				}
 			}
 		case <-statsTimer:
 			PrintMemUsage(start)

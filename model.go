@@ -6,7 +6,7 @@ type Game struct {
 }
 
 type PlayerViewListener interface {
-	channel() chan<- *PlayerView
+	outChannel() chan<- *PlayerView
 	forPlayer() int
 }
 
@@ -40,15 +40,17 @@ type HealthCheckable interface {
 }
 
 type Player struct {
-	Id     int
-	Name   string
-	Script string
+	Id            int
+	Name          string
+	Script        string
+	OneOffScripts []string
 }
 
 type PlayerScriptTask struct {
-	PlayerId int
-	Script   string
-	Game     *Game
+	PlayerId      int
+	Script        string
+	OneOffScripts []string
+	Game          *Game
 }
 
 type ScriptResponse struct {
@@ -82,4 +84,9 @@ type PlayerView struct {
 	Rooms          []*Room
 	CmdFails       *[]*CommandFailure
 	ScriptResponse *ScriptResponse
+}
+
+type PlayerOneOffCode struct {
+	Player  int
+	Command string
 }

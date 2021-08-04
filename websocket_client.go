@@ -6,7 +6,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -41,12 +40,14 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan *PlayerView
+	// Buffered channel of inbound messages.
+	receive chan PlayerOneOffCode
 
 	player int
 }
 
-func (c *Client) forPlayer() int              { return c.player }
-func (c *Client) channel() chan<- *PlayerView { return c.send }
+func (c *Client) forPlayer() int                 { return c.player }
+func (c *Client) outChannel() chan<- *PlayerView { return c.send }
 
 func (c *Client) readTask() {
 	defer func() {
@@ -62,12 +63,12 @@ func (c *Client) readTask() {
 	})
 
 	for {
-		_, _, err := c.conn.ReadMessage()
+		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
 			log.Printf("websocket error: %v", err)
 			break
 		}
-		fmt.Printf("got websocket message. ignoring it")
+		c.receive <- PlayerOneOffCode{c.player, string(msg)}
 	}
 }
 
@@ -127,7 +128,11 @@ func serveWs(coordinator Coordinator, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{coordinator: coordinator, conn: conn, send: make(chan *PlayerView, 256)}
+	client := &Client{
+		coordinator: coordinator,
+		conn:        conn,
+		send:        make(chan *PlayerView, 25),
+	}
 	client.coordinator.register() <- client
 
 	go client.writeTask()
